@@ -132,7 +132,7 @@ function Get-TargetResource
         Specifies a random amount of time to delay the start time of the trigger. The
         delay time is a random time between the time the task triggers and the time that
         you specify in this setting. This parameter is only valid in combination with the
-        Once, Daily and Weekly Schedule Types.
+        Once, Daily, Weekly, Monthly and MonthlyDOW Schedule Types.
 
     .PARAMETER RepetitionDuration
         Specifies how long the repetition pattern repeats after the task starts.
@@ -146,7 +146,7 @@ function Get-TargetResource
 
     .PARAMETER DaysOfWeek
         Specifies an array of the days of the week on which Task Scheduler runs the task. This
-        parameter is only valid in combination with the Weekly Schedule Type.
+        parameter is only valid in combination with the Weekly or MonthlyDOW Schedule Types.
 
     .PARAMETER WeeksInterval
         Specifies the interval between the weeks in the schedule. An interval of 1 produces
@@ -294,7 +294,7 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnIdle', 'OnEvent', 'AtCreation', 'OnSessionState')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'Monthly', 'MonthlyDOW', 'AtStartup', 'AtLogon', 'OnIdle', 'OnEvent', 'AtCreation', 'OnSessionState')]
         $ScheduleType,
 
         [Parameter()]
@@ -543,11 +543,23 @@ function Set-TargetResource
                 -ArgumentName WeeksInterval
         }
 
-        if ($ScheduleType -eq 'Weekly' -and $DaysOfWeek.Count -eq 0)
+        if (($ScheduleType -eq 'Weekly' -or $ScheduleType -eq 'MonthlyDOW') -and $DaysOfWeek.Count -eq 0)
         {
             New-InvalidArgumentException `
                 -Message ($script:localizedData.WeekDayMissingError) `
                 -ArgumentName DaysOfWeek
+        }
+        if ($ScheduleType -eq 'MonthlyDOW' -and $WeeksOfMonth.Count -eq 0)
+        {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.WeeksOfMonthMissingError) `
+                -ArgumentName WeeksOfMonth
+        }
+        if (($ScheduleType -eq 'Monthly' -or $ScheduleType -eq 'MonthlyDOW') -and $MonthOfYear.Count -eq 0)
+        {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.MonthOfYearMissingError) `
+                -ArgumentName MonthOfYear
         }
 
         if ($ScheduleType -eq 'OnEvent')
@@ -679,8 +691,8 @@ function Set-TargetResource
         # Configure the trigger
         $triggerParameters = @{}
 
-        # A random delay is only supported when the scheduleType is set to Once, Daily or Weekly
-        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0) -and $ScheduleType -in @('Once', 'Daily', 'Weekly'))
+        # A random delay is only supported when the scheduleType is set to Once, Daily, Weekly, Monthly or MonthlyDOW
+        if ($RandomDelay -gt [System.TimeSpan]::FromSeconds(0) -and $ScheduleType -in @('Once', 'Daily', 'Weekly', 'Monthly', 'MonthlyDOW'))
         {
             $triggerParameters.Add('RandomDelay', $RandomDelay)
         }
@@ -1141,7 +1153,7 @@ function Set-TargetResource
         Specifies a random amount of time to delay the start time of the trigger. The
         delay time is a random time between the time the task triggers and the time that
         you specify in this setting. This parameter is only valid in combination with the
-        Once, Daily and Weekly Schedule Types.
+        Once, Daily, Weekly, Monthly and MonthlyDOW Schedule Types.
 
     .PARAMETER RepetitionDuration
         Specifies how long the repetition pattern repeats after the task starts.
@@ -1155,7 +1167,7 @@ function Set-TargetResource
 
     .PARAMETER DaysOfWeek
         Specifies an array of the days of the week on which Task Scheduler runs the task. This
-        parameter is only valid in combination with the Weekly Schedule Type.
+        parameter is only valid in combination with the Weekly or MonthlyDOW Schedule Types.
 
     .PARAMETER WeeksInterval
         Specifies the interval between the weeks in the schedule. An interval of 1 produces
@@ -1304,7 +1316,7 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('Once', 'Daily', 'Weekly', 'AtStartup', 'AtLogon', 'OnIdle', 'OnEvent', 'AtCreation', 'OnSessionState')]
+        [ValidateSet('Once', 'Daily', 'Weekly', 'Monthly', 'MonthlyDOW', 'AtStartup', 'AtLogon', 'OnIdle', 'OnEvent', 'AtCreation', 'OnSessionState')]
         $ScheduleType,
 
         [Parameter()]
@@ -1507,9 +1519,9 @@ function Test-TargetResource
 
     if ($PSBoundParameters.ContainsKey('RandomDelay'))
     {
-        if ($ScheduleType -notin @('Once', 'Daily', 'Weekly'))
+        if ($ScheduleType -notin @('Once', 'Daily', 'Weekly', 'Monthly', 'MonthlyDOW'))
         {
-            # A random delay is only supported when the ScheduleType is set to Once, Daily or Weekly.
+            # A random delay is only supported when the ScheduleType is set to Once, Daily, Weekly, Monthly or MonthlyDOW.
             Write-Verbose -Message ($script:localizedData.IgnoreRandomDelayWithUnsupportedTriggerType -f $TaskName)
             $null = $PSBoundParameters.Remove('RandomDelay')
         }
@@ -1985,6 +1997,18 @@ function Get-CurrentResource
                 break
             }
 
+            'MSFT_TaskMonthlyTrigger'
+            {
+                $returnScheduleType = 'Monthly'
+                break
+            }
+
+            'MSFT_TaskMonthlyDOWTrigger'
+            {
+                $returnScheduleType = 'MonthlyDOW'
+                break
+            }
+
             'MSFT_TaskBootTrigger'
             {
                 $returnScheduleType = 'AtStartup'
@@ -2099,6 +2123,10 @@ function Get-CurrentResource
             StopAtDurationEnd               = $trigger.Repetition.StopAtDurationEnd
             TriggerExecutionTimeLimit       = ConvertTo-TimeSpanStringFromScheduledTaskString -TimeSpan $trigger.ExecutionTimeLimit
             DaysOfWeek                      = [System.String[]] $daysOfWeek
+            WeeksOfMonth                    = [System.String[]] $weeksOfMonth
+            MonthOfYear                     = [System.String[]] $monthOfYear
+            RunOnLastDayOfMonth             = $trigger.RunOnLastDayOfMonth
+            RunOnLastWeekOfMonth            = $trigger.RunOnLastWeekOfMonth
             WeeksInterval                   = [System.Uint32] $trigger.WeeksInterval
             User                            = $trigger.UserId
             DisallowDemandStart             = -not $settings.AllowDemandStart

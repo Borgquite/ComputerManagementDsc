@@ -9,7 +9,9 @@ ConvertFrom-StringData @'
     RepetitionDurationLessThanIntervalError = Repetition duration '{0}' is less than repetition interval '{1}'. Please set RepeatInterval to a value lower or equal to RepetitionDuration.
     DaysIntervalError = DaysInterval must be greater than zero (0) for Daily schedules. DaysInterval specified is '{0}'.
     WeeksIntervalError = WeeksInterval must be greater than zero (0) for Weekly schedules. WeeksInterval specified is '{0}'.
-    WeekDayMissingError = At least one weekday must be selected for Weekly schedule.
+    WeekDayMissingError = At least one weekday must be selected for Weekly or MonthlyDOW schedule.
+    WeeksOfMonthMissingError = At least one week of month must be selected for MonthlyDOW schedule.
+    MonthOfYearMissingError = At least one month of year must be selected for Monthly or MonthlyDOW schedule.
     OnEventSubscriptionError = No (valid) XML Event Subscription was provided. This is required when the scheduletype is OnEvent.
     OnSessionStateChangeError = No kind of session state change was provided. This is required when the scheduletype is OnSessionState.
     gMSAandCredentialError = Both ExecuteAsGMSA and (ExecuteAsCredential or BuiltInAccount) parameters have been specified. A task can run as a gMSA (Group Managed Service Account), a builtin service account or as a custom credential. Please modify your configuration to include just one of the three options.
@@ -26,7 +28,7 @@ ConvertFrom-StringData @'
     ConfigureTaskEventTrigger = Setting up an event based trigger on task {0}.
     ConfigureTaskCreationTrigger = Setting up a creation/modification trigger on task {0}.
     ConfigureTaskSessionStateTrigger = Setting up a session state trigger on task {0}.
-    IgnoreRandomDelayWithUnsupportedTriggerType = The parameter RandomDelay in task {0} is ignored. A random delay is only supported when the trigger type is set to Once, Daily or Weekly.
+    IgnoreRandomDelayWithUnsupportedTriggerType = The parameter RandomDelay in task {0} is ignored. A random delay is only supported when the trigger type is set to Once, Daily, Weekly, Monthly or MonthlyDOW.
     IgnoreDelayWithUnsupportedTriggerType = The parameter Delay in task {0} is ignored. A delay is only supported when the trigger type is set to AtLogon, AtStartup, OnEvent, AtCreation or OnSessionState.
     SetRepetitionTriggerMessage = Setting repetition trigger settings on task '{0}' in '{1}'.
     RetrieveScheduledTaskMessage = Retrieving the scheduled task '{0}' from '{1}'.
