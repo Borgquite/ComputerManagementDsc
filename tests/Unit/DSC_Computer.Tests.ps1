@@ -676,7 +676,7 @@ Describe 'DSC_Computer\Test-TargetResource' {
             }
         }
 
-        BeforeEach {
+        BeforeDiscovery {
             $testCases = @(
                 @{ Name = $env:COMPUTERNAME }
                 @{ Name = 'localhost' }

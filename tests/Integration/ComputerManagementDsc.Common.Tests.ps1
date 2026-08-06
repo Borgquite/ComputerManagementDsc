@@ -81,6 +81,12 @@ Describe 'ComputerManagementDsc.Common\Set-TimeZoneId' {
     #>
     Context '''Set-TimeZone'' is not available but ''Add-Type'' is available' {
         BeforeAll {
+            # Pester v6 throws instead of calling the real command when a mock has only
+            # -ParameterFilter behaviours and none match. Forward unmatched Get-Command
+            # calls (e.g. the 'Get-TimeZone' lookup in Get-TimeZoneId) to the real cmdlet
+            # to keep the v5 fall-through behaviour.
+            Mock -CommandName Get-Command -MockWith { & (Get-Command -Name 'Get-Command' -CommandType Cmdlet) @PesterBoundParameters }
+
             Mock -CommandName Get-Command -ParameterFilter {
                 $Name -eq 'Add-Type'
             } -MockWith { 'Add-Type' }

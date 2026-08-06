@@ -135,7 +135,7 @@ Describe "DSC_SystemProtection\Get-TargetResource" -Tag 'Get' {
                     $protectionSettings = Get-TargetResource -Ensure 'Present' -DriveLetter 'C'
 
                     $protectionSettings.Ensure | Should -Be 'Absent'
-                    Assert-MockCalled -CommandName Write-Warning -Times 1
+                    Should -Invoke -CommandName Write-Warning -Times 1
                 }
             }
         }
@@ -263,7 +263,7 @@ Describe "DSC_SystemProtection\Test-TargetResource" -Tag 'Test' {
                 $desiredState = Test-TargetResource -Ensure 'Present' -DriveLetter 'C'
 
                 $desiredState | Should -BeTrue
-                Assert-MockCalled -CommandName Write-Warning -Times 2
+                Should -Invoke -CommandName Write-Warning -Times 2
             }
         }
     }
@@ -357,7 +357,7 @@ Describe "DSC_SystemProtection\Set-TargetResource" -Tag 'Set' {
 
                     Set-TargetResource -Ensure 'Present' -DriveLetter 'P'
 
-                    Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
+                    Should -Invoke -CommandName Enable-ComputerRestore -Times 1
                 }
             }
 
@@ -369,7 +369,7 @@ Describe "DSC_SystemProtection\Set-TargetResource" -Tag 'Set' {
 
                     Set-TargetResource -Ensure 'Absent' -DriveLetter 'P'
 
-                    Assert-MockCalled -CommandName Disable-ComputerRestore
+                    Should -Invoke -CommandName Disable-ComputerRestore
                 }
             }
 
@@ -382,8 +382,8 @@ Describe "DSC_SystemProtection\Set-TargetResource" -Tag 'Set' {
 
                     Set-TargetResource -Ensure 'Present' -DriveLetter 'P' -DiskUsage 20
 
-                    Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
-                    Assert-MockCalled -CommandName Invoke-VssAdmin -Times 1
+                    Should -Invoke -CommandName Enable-ComputerRestore -Times 1
+                    Should -Invoke -CommandName Invoke-VssAdmin -Times 1
                 }
             }
 
@@ -425,10 +425,10 @@ Describe "DSC_SystemProtection\Set-TargetResource" -Tag 'Set' {
 
                     Set-TargetResource -Ensure  'Present' -DriveLetter 'P' -DiskUsage 1 -Force $true
 
-                    Assert-MockCalled -CommandName Enable-ComputerRestore -Times 1
-                    Assert-MockCalled -CommandName Invoke-VssAdmin -ParameterFilter { $Operation -eq 'Resize' } -Times 2
-                    Assert-MockCalled -CommandName Invoke-VssAdmin -ParameterFilter { $Operation -eq 'Delete' } -Times 1
-                    Assert-MockCalled -CommandName Write-Warning -Times 1
+                    Should -Invoke -CommandName Enable-ComputerRestore -Times 1
+                    Should -Invoke -CommandName Invoke-VssAdmin -ParameterFilter { $Operation -eq 'Resize' } -Times 2
+                    Should -Invoke -CommandName Invoke-VssAdmin -ParameterFilter { $Operation -eq 'Delete' } -Times 1
+                    Should -Invoke -CommandName Write-Warning -Times 1
                 }
             }
 

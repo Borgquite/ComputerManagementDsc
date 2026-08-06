@@ -113,7 +113,7 @@ Describe "DSC_SystemRestorePoint\Get-TargetResource" -Tag 'Get' {
                 $protectionSettings = Get-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
 
                 $protectionSettings.Ensure | Should -Be 'Absent'
-                Assert-MockCalled -CommandName Write-Warning -Times 1
+                Should -Invoke -CommandName Write-Warning -Times 1
             }
         }
     }
@@ -201,7 +201,7 @@ Describe "DSC_SystemRestorePoint\Test-TargetResource" -Tag 'Test' {
                 $desiredState = Test-TargetResource -Ensure 'Present' -Description 'DSC Unit Test'
 
                 $desiredState | Should -BeTrue
-                Assert-MockCalled -CommandName Write-Warning -Times 2
+                Should -Invoke -CommandName Write-Warning -Times 2
             }
         }
     }

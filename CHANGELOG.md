@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `ComputerManagementDsc`
+  - Updated unit tests for Pester 6 compatibility - replaced the removed
+    `Assert-MockCalled` with `Should -Invoke`, and moved a data-driven test's
+    `$testCases` into `BeforeDiscovery` so `-ForEach` is populated at discovery
+    time (Pester 6 throws on a `$null`/empty `-ForEach`).
 - `azure-pipelines.yml`
   - Remove `windows-2019` images fixes [#451](https://github.com/dsccommunity/ComputerManagementDsc/issues/451).
 - Module manifest: Set `CmdletsToExport` to `'*'` to satisfy HQRM tests.
